@@ -58,15 +58,21 @@ class TuneIn:
     @staticmethod
     def search(query):
         res = requests.post(TuneIn.search_url, data={"query": query})
-        for entry in xml2dict(res.text)['opml']['body']["outline"]:
-            if entry.get("type") == "audio" and entry.get("item") == "station":
-                yield TuneInStation(
-                    {"stream": TuneIn.get_stream_url(entry["URL"]),
-                     "url": entry["URL"],
-                     "title": entry.get("current_track") or entry.get("text"),
-                     "artist": entry.get("text"),
-                     "description": entry.get("subtext"),
-                     "image": entry.get("image"),
-                     "query": query
-                     })
+        res = xml2dict(res.text)
+        if not res.get("opml"):
+            return
+        for entry in res['opml']['body']["outline"]:
+            try:
+                if entry.get("type") == "audio" and entry.get("item") == "station":
+                    yield TuneInStation(
+                        {"stream": TuneIn.get_stream_url(entry["URL"]),
+                         "url": entry["URL"],
+                         "title": entry.get("current_track") or entry.get("text"),
+                         "artist": entry.get("text"),
+                         "description": entry.get("subtext"),
+                         "image": entry.get("image"),
+                         "query": query
+                         })
 
+            except:
+                continue
