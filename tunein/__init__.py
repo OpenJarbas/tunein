@@ -68,10 +68,10 @@ class TuneIn:
     @staticmethod
     def search(query):
         res = requests.post(TuneIn.search_url, data={"query": query})
-        yield from TuneIn._get_stations(res)
+        yield from TuneIn._get_stations(res, query)
 
     @staticmethod
-    def _get_stations(res: requests.Response):
+    def _get_stations(res: requests.Response, query: str = ""):
         res = xml2dict(res.text)
         if not res.get("opml"):
             return
@@ -93,7 +93,8 @@ class TuneIn:
                          "title": entry.get("current_track") or entry.get("text"),
                          "artist": entry.get("text"),
                          "description": entry.get("subtext"),
-                         "image": entry.get("image")
+                         "image": entry.get("image"),
+                         "query": query
                          })
 
             except:
