@@ -10,6 +10,10 @@ class TuneInStation:
     @property
     def title(self):
         return self.raw.get("title", "")
+    
+    @property
+    def artist(self):
+        return self.raw.get("artist", "")
 
     @property
     def image(self):
@@ -38,6 +42,7 @@ class TuneInStation:
 
 class TuneIn:
     search_url = "http://opml.radiotime.com/Search.ashx"
+    featured_url = "http://opml.radiotime.com/Browse.ashx?c=local"  # local stations
 
     @staticmethod
     def get_stream_url(url):
@@ -56,14 +61,32 @@ class TuneIn:
                     return url
 
     @staticmethod
+    def featured():
+        res = requests.post(TuneIn.featured_url)
+        yield from TuneIn._get_stations(res)
+
+    @staticmethod
     def search(query):
         res = requests.post(TuneIn.search_url, data={"query": query})
+        yield from TuneIn._get_stations(res, query)
+
+    @staticmethod
+    def _get_stations(res: requests.Response, query: str = ""):
         res = xml2dict(res.text)
         if not res.get("opml"):
             return
-        for entry in res['opml']['body']["outline"]:
+        # stations might be nested based on Playlist/Search
+        nested = res['opml']['body']["outline"][0].pop("outline", [])
+        if nested:
+            stations = nested
+        else: 
+            stations = res['opml']['body'].pop("outline", [])  
+
+        for entry in stations:
             try:
-                if entry.get("type") == "audio" and entry.get("item") == "station":
+                if not entry.get("key") == "unavailable" \
+                        and entry.get("type") == "audio" \
+                        and entry.get("item") == "station":
                     yield TuneInStation(
                         {"stream": TuneIn.get_stream_url(entry["URL"]),
                          "url": entry["URL"],
