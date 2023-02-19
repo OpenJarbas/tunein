@@ -1,5 +1,9 @@
 # Changelog
 
+## [V0.0.2a3](https://github.com/OpenJarbas/tunein/tree/V0.0.2a3) (2023-02-19)
+
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.2a2...V0.0.2a3)
+
 ## [V0.0.2a2](https://github.com/OpenJarbas/tunein/tree/V0.0.2a2) (2023-02-19)
 
 [Full Changelog](https://github.com/OpenJarbas/tunein/compare/56c2fbac974d0781513d86ccd08ab7bab1ea2ccf...V0.0.2a2)
