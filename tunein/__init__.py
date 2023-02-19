@@ -76,12 +76,15 @@ class TuneIn:
         if not res.get("opml"):
             return
         # stations might be nested based on Playlist/Search
-        nested = res['opml']['body']["outline"][0].pop("outline", [])
-        if nested:
-            stations = nested
-        else: 
-            stations = res['opml']['body'].pop("outline", [])  
+        outline = res['opml']['body']["outline"]
 
+        if isinstance(outline, list):
+            outline = outline[0]
+        assert isinstance(outline, dict)
+        if outline.get("outline"):
+            stations = outline["outline"]
+        else:
+            stations = outline
         for entry in stations:
             try:
                 if not entry.get("key") == "unavailable" \
@@ -96,6 +99,5 @@ class TuneIn:
                          "image": entry.get("image"),
                          "query": query
                          })
-
             except:
                 continue
