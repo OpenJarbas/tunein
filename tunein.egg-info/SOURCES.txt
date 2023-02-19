@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README.md
+requirements.txt
+setup.py
+tunein/__init__.py
+tunein/parse.py
+tunein/version.py
+tunein/xml_helper.py
+tunein.egg-info/PKG-INFO
+tunein.egg-info/SOURCES.txt
+tunein.egg-info/dependency_links.txt
+tunein.egg-info/requires.txt
+tunein.egg-info/top_level.txt
