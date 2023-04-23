@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenJarbas/tunein/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.2...HEAD)
+
+**Fixed bugs:**
+
+- fix voice requests [\#3](https://github.com/OpenJarbas/tunein/pull/3) ([emphasize](https://github.com/emphasize))
+
+## [V0.0.2](https://github.com/OpenJarbas/tunein/tree/V0.0.2) (2023-02-19)
+
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.2a3...V0.0.2)
+
 ## [V0.0.2a3](https://github.com/OpenJarbas/tunein/tree/V0.0.2a3) (2023-02-19)
 
 [Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.2a2...V0.0.2a3)
