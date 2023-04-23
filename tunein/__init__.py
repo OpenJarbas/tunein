@@ -78,13 +78,13 @@ class TuneIn:
         # stations might be nested based on Playlist/Search
         outline = res['opml']['body']["outline"]
 
-        if isinstance(outline, list):
-            outline = outline[0]
-        assert isinstance(outline, dict)
-        if outline.get("outline"):
-            stations = outline["outline"]
+        if not isinstance(outline, list):
+            return
+        if outline[0].get("outline"):
+            stations = outline[0]["outline"]
         else:
             stations = outline
+
         for entry in stations:
             try:
                 if not entry.get("key") == "unavailable" \
