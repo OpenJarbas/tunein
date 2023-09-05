@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/OpenJarbas/tunein/tree/HEAD)
+## [V0.0.3a1](https://github.com/OpenJarbas/tunein/tree/V0.0.3a1) (2023-04-23)
 
-[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.2...HEAD)
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.2...V0.0.3a1)
 
 **Fixed bugs:**
 
