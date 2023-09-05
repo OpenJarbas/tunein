@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenJarbas/tunein/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.3...HEAD)
+
+**Fixed bugs:**
+
+- use lists [\#4](https://github.com/OpenJarbas/tunein/pull/4) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.3](https://github.com/OpenJarbas/tunein/tree/V0.0.3) (2023-09-05)
+
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.3a2...V0.0.3)
+
 ## [V0.0.3a2](https://github.com/OpenJarbas/tunein/tree/V0.0.3a2) (2023-09-05)
 
 [Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.3a1...V0.0.3a2)
