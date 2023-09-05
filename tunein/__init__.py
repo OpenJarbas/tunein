@@ -63,12 +63,12 @@ class TuneIn:
     @staticmethod
     def featured():
         res = requests.post(TuneIn.featured_url)
-        yield from TuneIn._get_stations(res)
+        return list(TuneIn._get_stations(res))
 
     @staticmethod
     def search(query):
         res = requests.post(TuneIn.search_url, data={"query": query})
-        yield from TuneIn._get_stations(res, query)
+        return list(TuneIn._get_stations(res, query))
 
     @staticmethod
     def _get_stations(res: requests.Response, query: str = ""):
