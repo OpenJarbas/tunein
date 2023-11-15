@@ -38,7 +38,7 @@ class TuneInStation:
 
     def __repr__(self):
         return self.title
-    
+
     @property
     def dict(self):
         """Return a dict representation of the station."""
@@ -85,7 +85,6 @@ class TuneIn:
     @staticmethod
     def _get_stations(res: requests.Response, query: str = ""):
         res = xml2dict(res.text)
-        breakpoint()
         if not res.get("opml"):
             return
         # stations might be nested based on Playlist/Search
@@ -99,7 +98,6 @@ class TuneIn:
             stations = outline
 
         for entry in stations:
-            print(entry)
             try:
                 if not entry.get("key") == "unavailable" \
                         and entry.get("type") == "audio" \
