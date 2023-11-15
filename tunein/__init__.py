@@ -10,11 +10,11 @@ class TuneInStation:
     @property
     def title(self):
         return self.raw.get("title", "")
-    
+
     @property
     def artist(self):
         return self.raw.get("artist", "")
-    
+
     @property
     def image(self):
         return self.raw.get("image")
