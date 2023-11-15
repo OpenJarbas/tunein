@@ -54,4 +54,9 @@ setup(
     include_package_data=True,
     install_requires=get_requirements("requirements.txt"),
     keywords='TuneIn internet radio',
+    entry_points={
+    'console_scripts': [
+        'tunein = tunein.cli:main',
+    ],
+},
 )
