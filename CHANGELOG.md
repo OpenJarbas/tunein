@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenJarbas/tunein/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.3...HEAD)
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.4a1...HEAD)
+
+**Implemented enhancements:**
+
+- Add a basic CLI [\#5](https://github.com/OpenJarbas/tunein/pull/5) ([cidrblock](https://github.com/cidrblock))
+
+## [V0.0.4a1](https://github.com/OpenJarbas/tunein/tree/V0.0.4a1) (2023-09-05)
+
+[Full Changelog](https://github.com/OpenJarbas/tunein/compare/V0.0.3...V0.0.4a1)
 
 **Fixed bugs:**
 
