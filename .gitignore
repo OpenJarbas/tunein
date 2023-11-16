@@ -15,6 +15,7 @@ dist
 .vscode
 .theia
 .venv/
+venv/
 
 # Created by unit tests
 .pytest_cache/

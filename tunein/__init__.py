@@ -10,7 +10,7 @@ class TuneInStation:
     @property
     def title(self):
         return self.raw.get("title", "")
-    
+
     @property
     def artist(self):
         return self.raw.get("artist", "")
@@ -38,6 +38,18 @@ class TuneInStation:
 
     def __repr__(self):
         return self.title
+
+    @property
+    def dict(self):
+        """Return a dict representation of the station."""
+        return {
+            "artist": self.artist,
+            "description": self.description,
+            "image": self.image,
+            "match": self.match(),
+            "stream": self.stream,
+            "title": self.title,
+        }
 
 
 class TuneIn:
@@ -67,7 +79,7 @@ class TuneIn:
 
     @staticmethod
     def search(query):
-        res = requests.post(TuneIn.search_url, data={"query": query})
+        res = requests.post(TuneIn.search_url, data={"query": query, "formats": "mp3,aac,ogg,html,hls"})
         return list(TuneIn._get_stations(res, query))
 
     @staticmethod
