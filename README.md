@@ -15,7 +15,7 @@ tunein search "Radio paradise"
 ```
 
 ```
-tunein seach "Radio paradise" --format json
+tunein search "Radio paradise" --format json
 ```
 
 Command line help is available with `tunein --help`
