@@ -65,7 +65,8 @@ class TuneInStation:
 
 class TuneIn:
     search_url = "https://opml.radiotime.com/Search.ashx"
-    featured_url = "http://opml.radiotime.com/Browse.ashx?c=local"  # local stations
+    featured_url = "http://opml.radiotime.com/Browse.ashx"  # local stations
+    stnd_query = {"formats": "mp3,aac,ogg,html,hls", "render": "json"}
 
     @staticmethod
     def get_stream_urls(url):
@@ -83,25 +84,37 @@ class TuneIn:
         else:
             return "Failed to get stream url"
 
-        return res.json().get("body", {})
+        stations = res.json().get("body", {})
+
+        for station in stations:
+            if station.get("url", "").endswith(".pls"):
+                res = requests.get(station["url"])
+                file1 = [line for line in res.text.split("\n") if line.startswith("File1=")]
+                if file1:
+                    station["url"] = file1[0].split("File1=")[1]
+
+        return stations
 
     @staticmethod
     def featured():
-        res = requests.post(TuneIn.featured_url)
-        return list(TuneIn._get_stations(res))
+        res = requests.post(
+            TuneIn.featured_url,
+            data={**TuneIn.stnd_query, **{"c": "local"}}
+        )
+        stations = res.json().get("body", [{}])[0].get("children", [])
+        return list(TuneIn._get_stations(stations))
 
     @staticmethod
     def search(query):
         res = requests.post(
             TuneIn.search_url,
-            data={"query": query, "formats": "mp3,aac,ogg,html,hls", "render": "json"},
+            data={**TuneIn.stnd_query, **{"query": query}}
         )
-        return list(TuneIn._get_stations(res, query))
+        stations = res.json().get("body", [])
+        return list(TuneIn._get_stations(stations, query))
 
     @staticmethod
-    def _get_stations(res: requests.Response, query: str = ""):
-        stations = res.json().get("body", [])
-
+    def _get_stations(stations: requests.Response, query: str = ""):
         for entry in stations:
             if (
                 entry.get("key") == "unavailable"
