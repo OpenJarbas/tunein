@@ -1,5 +1,6 @@
+from urllib.parse import urlparse, urlunparse
+
 import requests
-from tunein.xml_helper import xml2dict
 from tunein.parse import fuzzy_match
 
 
@@ -14,6 +15,14 @@ class TuneInStation:
     @property
     def artist(self):
         return self.raw.get("artist", "")
+
+    @property
+    def bit_rate(self):
+        return self.raw.get("bitrate")
+
+    @property
+    def media_type(self):
+        return self.raw.get("media_type")
 
     @property
     def image(self):
@@ -44,72 +53,87 @@ class TuneInStation:
         """Return a dict representation of the station."""
         return {
             "artist": self.artist,
+            "bit_rate": self.bit_rate,
             "description": self.description,
             "image": self.image,
             "match": self.match(),
+            "media_type": self.media_type,
             "stream": self.stream,
             "title": self.title,
         }
 
 
 class TuneIn:
-    search_url = "http://opml.radiotime.com/Search.ashx"
-    featured_url = "http://opml.radiotime.com/Browse.ashx?c=local"  # local stations
+    search_url = "https://opml.radiotime.com/Search.ashx"
+    featured_url = "http://opml.radiotime.com/Browse.ashx"  # local stations
+    stnd_query = {"formats": "mp3,aac,ogg,html,hls", "render": "json"}
 
     @staticmethod
-    def get_stream_url(url):
-        res = requests.get(url)
-        for url in res.text.splitlines():
-            if (len(url) > 4):
-                if url[-3:] == 'm3u':
-                    return url[:-4]
-                if url[-3:] == 'pls':
-                    res2 = requests.get(url)
-                    # Loop through the data looking for the first url
-                    for line in res2.text.splitlines():
-                        if line.startswith("File1="):
-                            return line[6:]
-                else:
-                    return url
+    def get_stream_urls(url):
+        _url = urlparse(url)
+        for scheme in ("http", "https"):
+            url_str = urlunparse(
+                _url._replace(scheme=scheme, query=_url.query + "&render=json")
+            )
+            res = requests.get(url_str)
+            try:
+                res.raise_for_status()
+                break
+            except requests.exceptions.RequestException:
+                continue
+        else:
+            return "Failed to get stream url"
+
+        stations = res.json().get("body", {})
+
+        for station in stations:
+            if station.get("url", "").endswith(".pls"):
+                res = requests.get(station["url"])
+                file1 = [line for line in res.text.split("\n") if line.startswith("File1=")]
+                if file1:
+                    station["url"] = file1[0].split("File1=")[1]
+
+        return stations
 
     @staticmethod
     def featured():
-        res = requests.post(TuneIn.featured_url)
-        return list(TuneIn._get_stations(res))
+        res = requests.post(
+            TuneIn.featured_url,
+            data={**TuneIn.stnd_query, **{"c": "local"}}
+        )
+        stations = res.json().get("body", [{}])[0].get("children", [])
+        return list(TuneIn._get_stations(stations))
 
     @staticmethod
     def search(query):
-        res = requests.post(TuneIn.search_url, data={"query": query, "formats": "mp3,aac,ogg,html,hls"})
-        return list(TuneIn._get_stations(res, query))
+        res = requests.post(
+            TuneIn.search_url,
+            data={**TuneIn.stnd_query, **{"query": query}}
+        )
+        stations = res.json().get("body", [])
+        return list(TuneIn._get_stations(stations, query))
 
     @staticmethod
-    def _get_stations(res: requests.Response, query: str = ""):
-        res = xml2dict(res.text)
-        if not res.get("opml"):
-            return
-        # stations might be nested based on Playlist/Search
-        outline = res['opml']['body']["outline"]
-
-        if not isinstance(outline, list):
-            return
-        if outline[0].get("outline"):
-            stations = outline[0]["outline"]
-        else:
-            stations = outline
-
+    def _get_stations(stations: requests.Response, query: str = ""):
         for entry in stations:
-            try:
-                if not entry.get("key") == "unavailable" \
-                        and entry.get("type") == "audio" \
-                        and entry.get("item") == "station":
-                    yield TuneInStation(
-                        {"stream": TuneIn.get_stream_url(entry["URL"]),
-                         "url": entry["URL"],
-                         "title": entry.get("current_track") or entry.get("text"),
-                         "artist": entry.get("text"),
-                         "description": entry.get("subtext"),
-                         "image": entry.get("image"),
-                         "query": query
-                         })
-            except:
+            if (
+                entry.get("key") == "unavailable"
+                or entry.get("type") != "audio"
+                or entry.get("item") != "station"
+            ):
                 continue
+            streams = TuneIn.get_stream_urls(entry["URL"])
+            for stream in streams:
+                yield TuneInStation(
+                    {
+                        "stream": stream["url"],
+                        "bitrate": stream["bitrate"],
+                        "media_type": stream["media_type"],
+                        "url": entry["URL"],
+                        "title": entry.get("current_track") or entry.get("text"),
+                        "artist": entry.get("text"),
+                        "description": entry.get("subtext"),
+                        "image": entry.get("image"),
+                        "query": query,
+                    }
+                )
