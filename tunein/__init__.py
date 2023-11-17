@@ -1,6 +1,8 @@
+from urllib.parse import urlparse, urlunparse
+
 import requests
 from tunein.parse import fuzzy_match
-from urllib.parse import urlparse, urlunparse
+
 
 class TuneInStation:
     def __init__(self, raw):
@@ -13,11 +15,11 @@ class TuneInStation:
     @property
     def artist(self):
         return self.raw.get("artist", "")
-    
+
     @property
     def bit_rate(self):
         return self.raw.get("bitrate")
-    
+
     @property
     def media_type(self):
         return self.raw.get("media_type")
@@ -69,7 +71,9 @@ class TuneIn:
     def get_stream_urls(url):
         _url = urlparse(url)
         for scheme in ("http", "https"):
-            url_str = urlunparse(_url._replace(scheme=scheme, query=_url.query + "&render=json"))
+            url_str = urlunparse(
+                _url._replace(scheme=scheme, query=_url.query + "&render=json")
+            )
             res = requests.get(url_str)
             try:
                 res.raise_for_status()
@@ -88,7 +92,10 @@ class TuneIn:
 
     @staticmethod
     def search(query):
-        res = requests.post(TuneIn.search_url, data={"query": query, "formats": "mp3,aac,ogg,html,hls", "render": "json"})
+        res = requests.post(
+            TuneIn.search_url,
+            data={"query": query, "formats": "mp3,aac,ogg,html,hls", "render": "json"},
+        )
         return list(TuneIn._get_stations(res, query))
 
     @staticmethod
@@ -96,14 +103,17 @@ class TuneIn:
         stations = res.json().get("body", [])
 
         for entry in stations:
-            if entry.get("key") == "unavailable" \
-                or entry.get("type") != "audio" \
-                or entry.get("item") != "station":
+            if (
+                entry.get("key") == "unavailable"
+                or entry.get("type") != "audio"
+                or entry.get("item") != "station"
+            ):
                 continue
             streams = TuneIn.get_stream_urls(entry["URL"])
             for stream in streams:
                 yield TuneInStation(
-                    {"stream": stream["url"],
+                    {
+                        "stream": stream["url"],
                         "bitrate": stream["bitrate"],
                         "media_type": stream["media_type"],
                         "url": entry["URL"],
@@ -111,6 +121,6 @@ class TuneIn:
                         "artist": entry.get("text"),
                         "description": entry.get("subtext"),
                         "image": entry.get("image"),
-                        "query": query
-                        })
-            
+                        "query": query,
+                    }
+                )

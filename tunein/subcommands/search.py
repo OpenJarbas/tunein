@@ -9,6 +9,7 @@ import sys
 
 from tunein import TuneIn
 
+
 class Ansi:
     """ANSI escape codes."""
 
@@ -26,9 +27,11 @@ class Ansi:
     YELLOW = "\x1B[33m"
     GREY = "\x1B[90m"
 
+
 NOPRINT_TRANS_TABLE = {
     i: None for i in range(0, sys.maxunicode + 1) if not chr(i).isprintable()
 }
+
 
 class Search:
     """The search subcommand for tunein."""
@@ -36,7 +39,7 @@ class Search:
     def __init__(self: Search, args: argparse.Namespace) -> None:
         """Initialize the search subcommand."""
         self._args: argparse.Namespace = args
-    
+
     def run(self: Search) -> None:
         """Run the search subcommand."""
         tunein = TuneIn()
@@ -57,30 +60,56 @@ class Search:
             max_widths = {}
             columns = ["title", "bit_rate", "media_type", "artist", "description"]
             for column in columns:
-                max_width = max([len(str(station[column])) for station in stations] + [len(column)])
+                max_width = max(
+                    [len(str(station[column])) for station in stations] + [len(column)]
+                )
                 if column == "description":
                     term_width = shutil.get_terminal_size().columns
-                    remaining = term_width - sum([max_widths[column] for column in columns if column != "description"]) - len(columns) - 1
-                    max_width = min(max_width, remaining) 
+                    remaining = (
+                        term_width
+                        - sum(
+                            [
+                                max_widths[column]
+                                for column in columns
+                                if column != "description"
+                            ]
+                        )
+                        - len(columns)
+                        - 1
+                    )
+                    max_width = min(max_width, remaining)
                 max_widths[column] = max_width
 
-            print(" ".join(column.ljust(max_widths[column]).capitalize().replace("_", " ") for column in columns))
+            print(
+                " ".join(
+                    column.ljust(max_widths[column]).capitalize().replace("_", " ")
+                    for column in columns
+                )
+            )
             print(" ".join("-" * max_widths[column] for column in columns))
             for station in stations:
                 line_parts = []
                 # title as link
                 link = self._term_link(station.get("stream"), station["title"])
-                line_parts.append(f"{link}{' '*(max_widths['title']-len(station['title']))}")
+                line_parts.append(
+                    f"{link}{' '*(max_widths['title']-len(station['title']))}"
+                )
                 # bit rate
-                line_parts.append(str(station["bit_rate"]).ljust(max_widths["bit_rate"]))
+                line_parts.append(
+                    str(station["bit_rate"]).ljust(max_widths["bit_rate"])
+                )
                 # media type
-                line_parts.append(str(station["media_type"]).ljust(max_widths["media_type"]))
+                line_parts.append(
+                    str(station["media_type"]).ljust(max_widths["media_type"])
+                )
                 # artist
                 line_parts.append(str(station["artist"]).ljust(max_widths["artist"]))
                 # description clipped
-                line_parts.append(str(station["description"])[:max_widths["description"]])
+                line_parts.append(
+                    str(station["description"])[: max_widths["description"]]
+                )
                 print(" ".join(line_parts))
-    
+
     @staticmethod
     def _term_link(uri: str, label: str) -> str:
         """Return a link.
@@ -101,12 +130,10 @@ class Search:
     @staticmethod
     def _printable(string: str) -> str:
         """Replace non-printable characters in a string.
-        
+
         Args:
             string: The string to replace non-printable characters in.
         Returns:
             The string with non-printable characters replaced.
         """
         return string.translate(NOPRINT_TRANS_TABLE)
-
-
